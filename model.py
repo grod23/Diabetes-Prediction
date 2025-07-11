@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 class Model(nn.Module):
     # 8 Inputs, 2 Outputs
-    def __init__(self, input_features=8, n1=9, n2=10, output_features=2):
+    def __init__(self, input_features=8, n1=9, n2=10, output_features=1):
         super(Model, self).__init__()
         self.layer_1 = nn.Linear(input_features, n1)
         self.layer_2 = nn.Linear(n1, n2)
