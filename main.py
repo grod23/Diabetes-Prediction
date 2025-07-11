@@ -24,3 +24,14 @@ import pandas as pd
 import numpy as np
 import matplotlib as plt
 import seaborn as sns
+import os
+
+# Import Data
+
+diabetes_data = pd.read_csv(r"C:\Users\gabe7\Downloads\diabetes.csv")
+# print(diabetes_data.head())
+# print(diabetes_data.shape)
+
+# Data Shape: (768, 9)
+# print(diabetes_data.info())
+
