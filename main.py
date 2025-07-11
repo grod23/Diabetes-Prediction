@@ -28,6 +28,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import os
 from model import Model
+from sklearn.metrics import classification_report
 
 # Import Data
 
@@ -58,14 +59,30 @@ def main():
 
     # stratify ensures class distribution is preserved in both training and test sets. Important for imbalanced
     # datasets like this one: (500 Non-Diabetic, 268 Diabetic)
-    X_train, X_test, y_train, y_test = \
-        train_test_split(diabetes_data.loc[:, diabetes_data.columns != 'Outcome'], diabetes_data['Outcome'],
-                         stratify=diabetes_data['Outcome'], test_size=0.2,  random_state=66)
+
+    # First split: train+val and test
+    X_temp, X_test, y_temp, y_test = train_test_split(
+        diabetes_data.drop(columns="Outcome"),
+        diabetes_data["Outcome"],
+        test_size=0.2,
+        stratify=diabetes_data["Outcome"],
+        random_state=66
+    )
+
+    # Second split: train and validation
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_temp,
+        y_temp,
+        test_size=0.2,  # 20% of 80% = 16% → final split: 64% train, 16% val, 20% test
+        stratify=y_temp,
+        random_state=66
+    )
 
     # Pre-Processing
     # Standardization
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
+    X_val = scaler.transform(X_val)
     X_test = scaler.transform(X_test)
 
     # Convert to Tensors
@@ -74,6 +91,9 @@ def main():
     # N = Number of Data Samples/Rows
     X_train = torch.tensor(X_train, dtype=torch.float32)
     y_train = torch.tensor(y_train.values.reshape(-1, 1), dtype=torch.float32)
+
+    X_val = torch.tensor(X_val, dtype=torch.float32)
+    y_val = torch.tensor(y_val.values.reshape(-1, 1), dtype=torch.float32)
 
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_test = torch.tensor(y_test.values.reshape(-1, 1), dtype=torch.float32)
@@ -95,9 +115,14 @@ def main():
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        # Print Loss
+
+        model.eval()
+        with torch.no_grad():
+            val_logits = model(X_val)
+            val_loss = loss_fn(val_logits, y_val)
+
         if epoch % 100 == 0:
-            print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+            print(f"Epoch {epoch} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss.item():.4f}")
 
     # Loss VS Epoch
     plt.plot(losses)
@@ -120,34 +145,37 @@ def main():
         print(f'Correct: {correct}/{total}')
         print(f'Accuracy: {accuracy:.4f}')
 
-        # Epochs: 10000
-        # LR: .0001
-        # Train/Test Split: 75-25%
-        # Correct: 141/192
-        # Accuracy: 73.44
+    # After predictions
+    print(classification_report(y_test.numpy(), preds.numpy(), digits=4))
 
-        # Epochs: 10000
-        # LR: .0001
-        # Train/Test Split: 80-20%
-        # Correct: 118/154
-        # Accuracy: 76.62
+    # Epochs: 10000
+    # LR: .0001
+    # Train/Test Split: 75-25%
+    # Correct: 141/192
+    # Accuracy: 73.44
 
-        # Possible Issues:
-        # No Regularization
-        # No Early Stopping, Weight Decay, or Dropout
-        # Model Architecture 8-->9-->10-->1
-        # Accuracy may be misleading due to dataset imbalance
+    # Epochs: 10000
+    # LR: .0001
+    # Train/Test Split: 80-20%
+    # Correct: 118/154
+    # Accuracy: 76.62
 
-        # Possible Solutions:
-        # Add Evaluation Metrics such as Precision, Recall, and F1 Score
-        # Use a weighted BCE Loss
-        # Use a Validation Accuracy during training to watch for overfitting
-        # Use early stopping or fewer epochs
+    # Possible Issues:
+    # No Regularization
+    # No Early Stopping, Weight Decay, or Dropout
+    # Model Architecture 8-->9-->10-->1
+    # Accuracy may be misleading due to dataset imbalance
 
-        # Plot Loss vs Epoch
-        # Confusion Matrix
-        # Save and Reload Trained Model
-        # Use nn.Sequential()
+    # Possible Solutions:
+    # Add Evaluation Metrics such as Precision, Recall, and F1 Score
+    # Use a weighted BCE Loss
+    # Use a Validation Accuracy during training to watch for overfitting
+    # Use early stopping or fewer epochs
+
+    # Plot Loss vs Epoch
+    # Confusion Matrix
+    # Save and Reload Trained Model
+    # Use nn.Sequential()
 
 
 if __name__ == '__main__':
