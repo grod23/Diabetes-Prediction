@@ -120,6 +120,11 @@ def main():
         # Use a Validation Accuracy during training to watch for overfitting
         # Use early stopping or fewer epochs
 
+        # Plot Loss vs Epoch
+        # Confusion Matrix
+        # Save and Reload Trained Model
+        # Use nn.Sequential()
+
 
 if __name__ == '__main__':
     main()
