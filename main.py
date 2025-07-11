@@ -22,7 +22,7 @@ import torch.nn as nn
 import torch.functional as F
 import pandas as pd
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -43,7 +43,7 @@ diabetes_data = pd.read_csv(r"C:\Users\gabe7\Downloads\diabetes.csv")
 
 def main():
     torch.manual_seed(51)
-    learning_rate = 0.01
+    learning_rate = 0.001
     epochs = 10000
 
     model = Model()
@@ -60,7 +60,7 @@ def main():
     # datasets like this one: (500 Non-Diabetic, 268 Diabetic)
     X_train, X_test, y_train, y_test = \
         train_test_split(diabetes_data.loc[:, diabetes_data.columns != 'Outcome'], diabetes_data['Outcome'],
-                         stratify=diabetes_data['Outcome'], random_state=66)
+                         stratify=diabetes_data['Outcome'], test_size=0.2,  random_state=66)
 
     # Pre-Processing
     # Standardization
@@ -78,18 +78,33 @@ def main():
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_test = torch.tensor(y_test.values.reshape(-1, 1), dtype=torch.float32)
 
-    print(X_train)
-    print(X_train.shape)
+    # print(X_train)
+    # print(X_train.shape)
 
     # Train
+
+    # Track Loss
+    losses = []
     for epoch in range(epochs):
+        model.train()
         y_hat = model(X_train)
         loss = loss_fn(y_hat, y_train)
+        # Append Loss
+        losses.append(loss.detach().numpy())
+        # Backprop
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        # Print Loss
         if epoch % 100 == 0:
             print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+
+    # Loss VS Epoch
+    plt.plot(losses)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss vs. Epoch")
+    plt.show()
 
     # Testing
     model.eval()
@@ -105,8 +120,17 @@ def main():
         print(f'Correct: {correct}/{total}')
         print(f'Accuracy: {accuracy:.4f}')
 
-        # Correct: 130/192
-        # Accuracy: 67.71
+        # Epochs: 10000
+        # LR: .0001
+        # Train/Test Split: 75-25%
+        # Correct: 141/192
+        # Accuracy: 73.44
+
+        # Epochs: 10000
+        # LR: .0001
+        # Train/Test Split: 80-20%
+        # Correct: 118/154
+        # Accuracy: 76.62
 
         # Possible Issues:
         # No Regularization
