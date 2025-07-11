@@ -44,14 +44,16 @@ diabetes_data = pd.read_csv(r"C:\Users\gabe7\Downloads\diabetes.csv")
 
 def main():
     torch.manual_seed(51)
-    learning_rate = 0.001
-    epochs = 10000
+    learning_rate = 0.005
+    epochs = 1000
+    position_weight = torch.tensor([500 / 268])
+    weight_decay = 0.01
 
     model = Model()
-    # ADAM Optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    # ADAM Optimizer(Adding Weight Decay)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     # Binary Cross Entropy Loss(WithLogitsLoss combines sigmoid activation and BCE Loss in one function)
-    loss_fn = nn.BCEWithLogitsLoss()
+    loss_fn = nn.BCEWithLogitsLoss(pos_weight=position_weight)  # Added Weighted Loss
 
     # Set X and y Values
 
@@ -148,31 +150,21 @@ def main():
     # After predictions
     print(classification_report(y_test.numpy(), preds.numpy(), digits=4))
 
-    # Epochs: 10000
-    # LR: .0001
-    # Train/Test Split: 75-25%
-    # Correct: 141/192
-    # Accuracy: 73.44
+    # Correct: 122/154
+    # Accuracy: 0.7922
+    #               precision    recall  f1-score   support
+    #
+    #          0.0     0.9595    0.7100    0.8161       100
+    #          1.0     0.6375    0.9444    0.7612        54
+    #
+    #     accuracy                         0.7922       154
+    #    macro avg     0.7985    0.8272    0.7886       154
+    # weighted avg     0.8466    0.7922    0.7968       154
+    # Dropout: 0.1
+    # Weight_Decay .01
+    # Epochs: 1000
+    # LR: 0.005
 
-    # Epochs: 10000
-    # LR: .0001
-    # Train/Test Split: 80-20%
-    # Correct: 118/154
-    # Accuracy: 76.62
-
-    # Possible Issues:
-    # No Regularization
-    # No Early Stopping, Weight Decay, or Dropout
-    # Model Architecture 8-->9-->10-->1
-    # Accuracy may be misleading due to dataset imbalance
-
-    # Possible Solutions:
-    # Add Evaluation Metrics such as Precision, Recall, and F1 Score
-    # Use a weighted BCE Loss
-    # Use a Validation Accuracy during training to watch for overfitting
-    # Use early stopping or fewer epochs
-
-    # Plot Loss vs Epoch
     # Confusion Matrix
     # Save and Reload Trained Model
     # Use nn.Sequential()
