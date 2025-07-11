@@ -108,6 +108,18 @@ def main():
         # Correct: 130/192
         # Accuracy: 67.71
 
+        # Possible Issues:
+        # No Regularization
+        # No Early Stopping, Weight Decay, or Dropout
+        # Model Architecture 8-->9-->10-->1
+        # Accuracy may be misleading due to dataset imbalance
+
+        # Possible Solutions:
+        # Add Evaluation Metrics such as Precision, Recall, and F1 Score
+        # Use a weighted BCE Loss
+        # Use a Validation Accuracy during training to watch for overfitting
+        # Use early stopping or fewer epochs
+
 
 if __name__ == '__main__':
     main()
