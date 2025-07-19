@@ -1,56 +1,21 @@
-# About 2 in 7 adults are diagnosed with diabetes
-# Datapoints:
-#  Pregnancies, Glucose, Blood Pressure, Skin Thickness, Insulin, BMI, DiabetesPedigreeFunction, Age
-# Outcome: 0 = No Diabetes. 1 = Diabetes
-# From Data, 500 labeled as 0, 268 labeled as 1
-# 8 Inputs
-# 1 Output
-
-# Binary Classification/Logistic Regression Problem
-# Loss Function: BCE
-# Outputs will be between 0 and 1. Don't want outputs less than 0
-# Activation Function: ReLU
-# Optimization Algorithm: ADAM
-
-# Pre-Processing:
-# Standardization(Data has a mean of 0 and Standard Deviation of 1)
-
-# Train Test split starting at 80-20%
-
+import random
+from model import Model
 import torch
 import torch.nn as nn
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from model import Model
+import pandas as pd
 from sklearn.metrics import classification_report
-from torch.utils.data import DataLoader, TensorDataset
-import random
-
-# Import Data
 
 diabetes_data = pd.read_csv(r"C:\Users\gabe7\Downloads\diabetes.csv")
+torch.manual_seed(51)
 
 
-# print(diabetes_data.head())
-# print(diabetes_data.shape)
-
-# Data Shape: (768, 9)
-# print(diabetes_data.info())
-
-
-def main():
-    torch.manual_seed(51)
-    np.random.seed(51)
-    random.seed(51)
-    learning_rate = 0.005
+def train_evaluation(learning_rate, dropout_rate, hidden_size, weight_decay):
     epochs = 1000
     position_weight = torch.tensor([500 / 268])
-    weight_decay = 0.01
-
-    model = Model()
+    hidden_size_double = hidden_size * 2
+    model = Model(n1=hidden_size, n2=hidden_size_double, dropout_prob=dropout_rate)
     # ADAM Optimizer(Adding Weight Decay)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     # Binary Cross Entropy Loss(WithLogitsLoss combines sigmoid activation and BCE Loss in one function)
@@ -101,9 +66,6 @@ def main():
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_test = torch.tensor(y_test.values.reshape(-1, 1), dtype=torch.float32)
 
-    # print(X_train)
-    # print(X_train.shape)
-
     # Train
 
     # Track Loss
@@ -128,11 +90,11 @@ def main():
             print(f"Epoch {epoch} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss.item():.4f}")
 
     # Loss VS Epoch
-    plt.plot(losses)
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.title("Loss vs. Epoch")
-    plt.show()
+    # plt.plot(losses)
+    # plt.xlabel("Epoch")
+    # plt.ylabel("Loss")
+    # plt.title("Loss vs. Epoch")
+    # plt.show()
 
     # Testing
     model.eval()
@@ -151,27 +113,62 @@ def main():
     # After predictions
     print(classification_report(y_test.numpy(), preds.numpy(), digits=4))
 
-    # Correct: 122/154
-    # Accuracy: 0.7922
-    #               precision    recall  f1-score   support
-    #
-    #          0.0     0.9595    0.7100    0.8161       100
-    #          1.0     0.6375    0.9444    0.7612        54
-    #
-    #     accuracy                         0.7922       154
-    #    macro avg     0.7985    0.8272    0.7886       154
-    # weighted avg     0.8466    0.7922    0.7968       154
-    # Dropout: 0.1
-    # Weight_Decay .01
-    # Epochs: 1000
-    # LR: 0.005
-
-    # Save and Reload Trained Model
-    # Use nn.Sequential()
-
-    # Hyper-Parameter Tuning:
-    # Random Search
+    return accuracy
 
 
-if __name__ == '__main__':
-    main()
+def random_search(trials):
+    best_accuracy = 0
+    best_parameters = None
+    best_trial = 0
+
+    for trial in range(trials):
+        print(f"\n🔍 Trial {trial + 1}/{trials}")
+
+        # Random Hyperparameters
+        lr = 10 ** random.uniform(-4, -2)  # Learning Rate: 0.0001 to 0.01
+        dropout = random.uniform(0.1, 0.5)  # Dropout: 0.1 to 0.5
+        hidden_size = random.choice([16, 32, 64])  # Hidden Layer Size
+        weight_decay = 10 ** random.uniform(-4, -1)  # Weight Decay: 0.0001 to 0.01
+
+        print(f"Testing: lr={lr:.5f}, dropout={dropout:.2f}, hidden={hidden_size}, weight_decay={weight_decay:.5f}")
+
+        accuracy = train_evaluation(lr, dropout, hidden_size, weight_decay)
+        if accuracy > best_accuracy:
+            best_accuracy = accuracy
+            best_parameters = (lr, dropout, hidden_size, weight_decay)
+            best_trial = trial + 1
+
+        print(f"\n🏆 Best Configuration: {best_trial}")
+        print(f"Accuracy: {best_accuracy:.4f}")
+        print(
+            f"lr={best_parameters[0]:.5f}, dropout={best_parameters[1]:.2f}, hidden={best_parameters[2]}, "
+            f"weight_decay={best_parameters[3]:.5f}")
+
+
+random_search(50)
+
+# Trial 15/50
+# Testing: lr=0.00243, dropout=0.28, hidden=64, weight_decay=0.01467
+# Epoch 0 | Train Loss: 0.8904 | Val Loss: 0.8689
+# Epoch 100 | Train Loss: 0.6136 | Val Loss: 0.7059
+# Epoch 200 | Train Loss: 0.5791 | Val Loss: 0.7174
+# Epoch 300 | Train Loss: 0.5676 | Val Loss: 0.7209
+# Epoch 400 | Train Loss: 0.5697 | Val Loss: 0.7214
+# Epoch 500 | Train Loss: 0.5560 | Val Loss: 0.7219
+# Epoch 600 | Train Loss: 0.5658 | Val Loss: 0.7242
+# Epoch 700 | Train Loss: 0.5618 | Val Loss: 0.7239
+# Epoch 800 | Train Loss: 0.5537 | Val Loss: 0.7184
+# Epoch 900 | Train Loss: 0.5551 | Val Loss: 0.7268
+# Correct: 125/154
+# Accuracy: 0.8117
+#               precision    recall  f1-score   support
+#
+#          0.0     0.9610    0.7400    0.8362       100
+#          1.0     0.6623    0.9444    0.7786        54
+#
+#     accuracy                         0.8117       154
+#    macro avg     0.8117    0.8422    0.8074       154
+# weighted avg     0.8563    0.8117    0.8160       154
+# Best Configuration: 15
+# Accuracy: 0.8117
+# lr=0.00243, dropout=0.28, hidden=64, weight_decay=0.01467
