@@ -166,20 +166,31 @@ def main():
 
     # Testing
     model.eval()
+    correct = 0
+    total = 0
+    all_preds = []
+    all_targets = []
     with torch.no_grad():
-        logits = model(X_test)  # Raw outputs
-        probs = torch.sigmoid(logits)  # Convert logits to probabilities
-        preds = (probs > 0.5).float()  # Threshold to get binary predictions
+        for X_test, y_test in test_loader:
+            logits = model(X_test)  # Raw outputs
+            probs = torch.sigmoid(logits)  # Convert logits to probabilities
+            preds = (probs > 0.5).float()  # Threshold to get binary predictions
 
-        correct = (preds == y_test).sum().item()
-        total = y_test.size(0)
+            correct += (preds == y_test).sum().item()
+            total += y_test.size(0)
+            all_preds.append(preds)
+            all_targets.append(y_test)
+
         accuracy = correct / total
-
         print(f'Correct: {correct}/{total}')
         print(f'Accuracy: {accuracy:.4f}')
 
+    # Concatenate all predictions and targets
+    all_preds_tensor = torch.cat(all_preds)
+    all_targets_tensor = torch.cat(all_targets)
     # After predictions
-    print(classification_report(y_test.numpy(), preds.numpy(), digits=4))
+
+    print(classification_report(all_targets_tensor.numpy(), all_preds_tensor.numpy(), digits=4))
 
     # Correct: 122/154
     # Accuracy: 0.7922
