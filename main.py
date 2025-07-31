@@ -46,9 +46,10 @@ def main():
     np.random.seed(51)
     random.seed(51)
     learning_rate = 0.005
-    epochs = 1000
+    epochs = 10
     position_weight = torch.tensor([500 / 268])
     weight_decay = 0.01
+    batches = 10
 
     model = Model()
     # ADAM Optimizer(Adding Weight Decay)
@@ -101,31 +102,60 @@ def main():
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_test = torch.tensor(y_test.values.reshape(-1, 1), dtype=torch.float32)
 
-    # print(X_train)
-    # print(X_train.shape)
+    # Create Tensor Datasets
+    train_dataset = TensorDataset(X_train, y_train)
+    val_dataset = TensorDataset(X_val, y_val)
+    test_dataset = TensorDataset(X_test, y_test)
+
+    # Create DataLoaders
+
+    train_loader = DataLoader(train_dataset, batch_size=batches, shuffle=True)  # Only want shuffle when training
+    val_loader = DataLoader(val_dataset, batch_size=batches, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batches, shuffle=False)
 
     # Train
 
     # Track Loss
     losses = []
+
     for epoch in range(epochs):
         model.train()
-        y_hat = model(X_train)
-        loss = loss_fn(y_hat, y_train)
-        # Append Loss
-        losses.append(loss.detach().numpy())
-        # Backprop
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        epoch_loss = 0.0
 
+        for batch_X, batch_y in train_loader:
+            y_hat = model(batch_X)
+            loss = loss_fn(y_hat, batch_y)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+
+        # Track average training loss for the epoch
+        avg_train_loss = epoch_loss / len(train_loader)
+        losses.append(avg_train_loss)
+
+        # Validation loop
         model.eval()
-        with torch.no_grad():
-            val_logits = model(X_val)
-            val_loss = loss_fn(val_logits, y_val)
+        val_loss_total = 0.0
+        val_correct = 0
+        val_total = 0
 
-        if epoch % 100 == 0:
-            print(f"Epoch {epoch} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss.item():.4f}")
+        with torch.no_grad():
+            for X_val, y_val in val_loader:
+                val_logits = model(X_val)
+                val_loss = loss_fn(val_logits, y_val)
+                val_loss_total += val_loss.item()
+
+                val_probs = torch.sigmoid(val_logits)
+                val_preds = (val_probs > 0.5).float()
+                val_correct += (val_preds == y_val).sum().item()
+                val_total += y_val.size(0)
+
+        avg_val_loss = val_loss_total / len(val_loader)
+        val_accuracy = val_correct / val_total
+
+        print(f"Epoch: {epoch}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}, "
+              f"Val Accuracy: {val_accuracy:.4f}")
 
     # Loss VS Epoch
     plt.plot(losses)
