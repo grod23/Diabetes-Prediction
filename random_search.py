@@ -23,12 +23,12 @@ torch.manual_seed(51)
 # Hidden Layer Neuron Size
 
 def objective(trial):
-    learning_rate = trial.suggest_float('learing_rate', 1e-4, 1e-2, log=True)
+    learning_rate = trial.suggest_float('learning_rate', 1e-4, 1e-2, log=True)
     epochs = trial.suggest_categorical("epochs", [10, 50, 100, 250, 500, 1000])
     batches = trial.suggest_categorical("batches", [10, 16, 32, 64, 128])
     dropout = trial.suggest_float('dropout', 0.0, 0.5)
     weight_decay = trial.suggest_float('weight_decay', 1e-6, 1e-2, log=True)
-    hidden_size = trial.suggest_int("hidden_size", 32, 256)
+    # hidden_size = trial.suggest_int("hidden_size", 32, 256)
 
     # Call train() Function
     torch.manual_seed(51)
@@ -36,8 +36,7 @@ def objective(trial):
     random.seed(51)
     position_weight = torch.tensor([500 / 268])
 
-    hidden_size_two = hidden_size + 1
-    model = Model(n1=hidden_size, n2=hidden_size_two, dropout_prob=dropout)
+    model = Model(dropout_prob=dropout)
     # ADAM Optimizer(Adding Weight Decay)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     # Binary Cross Entropy Loss(WithLogitsLoss combines sigmoid activation and BCE Loss in one function)
@@ -127,5 +126,13 @@ def objective(trial):
 
 
 study = optuna.create_study(direction='maximize')
-study.optimize(objective, n_trials=100)
-print(study.best_params)
+study.optimize(objective, n_trials=1000)
+print("Best hyperparameters:", study.best_params)
+print(f"Best validation accuracy: {study.best_value:.4f}")
+
+# learNing_rate': 0.0012526868639613671, 'epochs': 50, 'batches': 64, 'dropout': 0.10229476735256574,
+# 'weight_decay': 1.037538434833678e-06, 'hidden_size': 132}
+
+# Best hyperparameters: {'learning_rate': 0.003067127556949599, 'epochs': 50, 'batches': 16,
+# 'dropout': 0.13888900962321554, 'weight_decay': 3.9538410247089555e-05, 'hidden_size': 50}
+# Best validation accuracy: 0.7967
