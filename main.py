@@ -199,26 +199,18 @@ def main():
 
     print(classification_report(all_targets_tensor.numpy(), all_preds_tensor.numpy(), digits=4))
 
-    # Correct: 122/154
-    # Accuracy: 0.7922
-    #               precision    recall  f1-score   support
-    #
-    #          0.0     0.9595    0.7100    0.8161       100
-    #          1.0     0.6375    0.9444    0.7612        54
-    #
-    #     accuracy                         0.7922       154
-    #    macro avg     0.7985    0.8272    0.7886       154
-    # weighted avg     0.8466    0.7922    0.7968       154
-    # Dropout: 0.1
-    # Weight_Decay .01
-    # Epochs: 1000
-    # LR: 0.005
+    # Save and Reload Model
 
-    # Save and Reload Trained Model
-    # Use nn.Sequential()
+    # Correct: 124 / 154
+    # Accuracy: 0.8052
 
-    # Hyper-Parameter Tuning:
-    # Random Search
+#     precision    recall  f1-score   support
+#          0.0     0.9487    0.7400    0.8315       100
+#          1.0     0.6579    0.9259    0.7692        54
+#
+#     accuracy                         0.8052       154
+#    macro avg     0.8033    0.8330    0.8003       154
+# weighted avg     0.8467    0.8052    0.8096       154
 
 
 if __name__ == '__main__':
