@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from sklearn.metrics import classification_report
-import matplotlib.pyplot as plt
 
 diabetes_data = pd.read_csv(r"C:\Users\gabe7\Downloads\diabetes.csv")
 torch.manual_seed(51)
