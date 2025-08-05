@@ -45,12 +45,13 @@ def main():
     torch.manual_seed(51)
     np.random.seed(51)
     random.seed(51)
-    learning_rate = 0.005
+    learning_rate = 0.00243
     epochs = 1000
     position_weight = torch.tensor([500 / 268])
-    weight_decay = 0.01
+    weight_decay = 0.01467
+    dropout_prob = 0.28
 
-    model = Model()
+    model = Model(dropout_prob=dropout_prob)
     # ADAM Optimizer(Adding Weight Decay)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     # Binary Cross Entropy Loss(WithLogitsLoss combines sigmoid activation and BCE Loss in one function)
