@@ -49,9 +49,9 @@ def main():
     epochs = 50
     position_weight = torch.tensor([500 / 268])  # Data is imbalanced: May decrease accuracy but will increase recall
     # on Class 1 which is most important
-    weight_decay = 0.04
+    weight_decay = 0.05
     batches = 64
-    dropout_prob = .013
+    dropout_prob = .02
 
     model = Model(dropout_prob=dropout_prob)
     # ADAM Optimizer(Adding Weight Decay)
