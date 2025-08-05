@@ -45,13 +45,15 @@ def main():
     torch.manual_seed(51)
     np.random.seed(51)
     random.seed(51)
-    learning_rate = 0.005
-    epochs = 10
-    position_weight = torch.tensor([500 / 268])
-    weight_decay = 0.01
-    batches = 10
+    learning_rate = 0.003
+    epochs = 50
+    position_weight = torch.tensor([500 / 268])  # Data is imbalanced: May decrease accuracy but will increase recall
+    # on Class 1 which is most important
+    weight_decay = 0.04
+    batches = 64
+    dropout_prob = .013
 
-    model = Model()
+    model = Model(dropout_prob=dropout_prob)
     # ADAM Optimizer(Adding Weight Decay)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     # Binary Cross Entropy Loss(WithLogitsLoss combines sigmoid activation and BCE Loss in one function)
@@ -151,11 +153,16 @@ def main():
                 val_correct += (val_preds == y_val).sum().item()
                 val_total += y_val.size(0)
 
+                # Recall
+                true_positives = ((val_preds == 1) & (y_val == 1)).sum().item()
+                actual_positives = (y_val == 1).sum().item()
+
         avg_val_loss = val_loss_total / len(val_loader)
         val_accuracy = val_correct / val_total
+        recall = true_positives / actual_positives if actual_positives > 0 else 0
 
         print(f"Epoch: {epoch}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}, "
-              f"Val Accuracy: {val_accuracy:.4f}")
+              f"Val Accuracy: {val_accuracy:.4f}, Recall: {recall}")
 
     # Loss VS Epoch
     plt.plot(losses)
