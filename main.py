@@ -45,12 +45,15 @@ def main():
     torch.manual_seed(51)
     np.random.seed(51)
     random.seed(51)
-    learning_rate = 0.005
-    epochs = 1000
-    position_weight = torch.tensor([500 / 268])
-    weight_decay = 0.01
+    learning_rate = 0.003
+    epochs = 50
+    position_weight = torch.tensor([500 / 268])  # Data is imbalanced: May decrease accuracy but will increase recall
+    # on Class 1 which is most important
+    weight_decay = 0.05
+    batches = 64
+    dropout_prob = .02
 
-    model = Model()
+    model = Model(dropout_prob=dropout_prob)
     # ADAM Optimizer(Adding Weight Decay)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     # Binary Cross Entropy Loss(WithLogitsLoss combines sigmoid activation and BCE Loss in one function)
@@ -101,31 +104,65 @@ def main():
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_test = torch.tensor(y_test.values.reshape(-1, 1), dtype=torch.float32)
 
-    # print(X_train)
-    # print(X_train.shape)
+    # Create Tensor Datasets
+    train_dataset = TensorDataset(X_train, y_train)
+    val_dataset = TensorDataset(X_val, y_val)
+    test_dataset = TensorDataset(X_test, y_test)
+
+    # Create DataLoaders
+
+    train_loader = DataLoader(train_dataset, batch_size=batches, shuffle=True)  # Only want shuffle when training
+    val_loader = DataLoader(val_dataset, batch_size=batches, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batches, shuffle=False)
 
     # Train
 
     # Track Loss
     losses = []
+
     for epoch in range(epochs):
         model.train()
-        y_hat = model(X_train)
-        loss = loss_fn(y_hat, y_train)
-        # Append Loss
-        losses.append(loss.detach().numpy())
-        # Backprop
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        epoch_loss = 0.0
 
+        for batch_X, batch_y in train_loader:
+            y_hat = model(batch_X)
+            loss = loss_fn(y_hat, batch_y)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+
+        # Track average training loss for the epoch
+        avg_train_loss = epoch_loss / len(train_loader)
+        losses.append(avg_train_loss)
+
+        # Validation loop
         model.eval()
-        with torch.no_grad():
-            val_logits = model(X_val)
-            val_loss = loss_fn(val_logits, y_val)
+        val_loss_total = 0.0
+        val_correct = 0
+        val_total = 0
 
-        if epoch % 100 == 0:
-            print(f"Epoch {epoch} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss.item():.4f}")
+        with torch.no_grad():
+            for X_val, y_val in val_loader:
+                val_logits = model(X_val)
+                val_loss = loss_fn(val_logits, y_val)
+                val_loss_total += val_loss.item()
+
+                val_probs = torch.sigmoid(val_logits)
+                val_preds = (val_probs > 0.5).float()
+                val_correct += (val_preds == y_val).sum().item()
+                val_total += y_val.size(0)
+
+                # Recall
+                true_positives = ((val_preds == 1) & (y_val == 1)).sum().item()
+                actual_positives = (y_val == 1).sum().item()
+
+        avg_val_loss = val_loss_total / len(val_loader)
+        val_accuracy = val_correct / val_total
+        recall = true_positives / actual_positives if actual_positives > 0 else 0
+
+        print(f"Epoch: {epoch}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}, "
+              f"Val Accuracy: {val_accuracy:.4f}, Recall: {recall}")
 
     # Loss VS Epoch
     plt.plot(losses)
@@ -136,20 +173,31 @@ def main():
 
     # Testing
     model.eval()
+    correct = 0
+    total = 0
+    all_preds = []
+    all_targets = []
     with torch.no_grad():
-        logits = model(X_test)  # Raw outputs
-        probs = torch.sigmoid(logits)  # Convert logits to probabilities
-        preds = (probs > 0.5).float()  # Threshold to get binary predictions
+        for X_test, y_test in test_loader:
+            logits = model(X_test)  # Raw outputs
+            probs = torch.sigmoid(logits)  # Convert logits to probabilities
+            preds = (probs > 0.5).float()  # Threshold to get binary predictions
 
-        correct = (preds == y_test).sum().item()
-        total = y_test.size(0)
+            correct += (preds == y_test).sum().item()
+            total += y_test.size(0)
+            all_preds.append(preds)
+            all_targets.append(y_test)
+
         accuracy = correct / total
-
         print(f'Correct: {correct}/{total}')
         print(f'Accuracy: {accuracy:.4f}')
 
+    # Concatenate all predictions and targets
+    all_preds_tensor = torch.cat(all_preds)
+    all_targets_tensor = torch.cat(all_targets)
     # After predictions
-    print(classification_report(y_test.numpy(), preds.numpy(), digits=4))
+
+    print(classification_report(all_targets_tensor.numpy(), all_preds_tensor.numpy(), digits=4))
 
     # Correct: 122/154
     # Accuracy: 0.7922
