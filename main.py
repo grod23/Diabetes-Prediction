@@ -28,6 +28,7 @@ from model import Model
 from sklearn.metrics import classification_report
 from torch.utils.data import DataLoader, TensorDataset
 import random
+import joblib
 
 # Import Data
 
@@ -90,6 +91,9 @@ def main():
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)
     X_test = scaler.transform(X_test)
+
+    # Save Scaler
+    joblib.dump(scaler, 'scaler.pkl')
 
     # Convert to Tensors
 
@@ -200,9 +204,11 @@ def main():
     print(classification_report(all_targets_tensor.numpy(), all_preds_tensor.numpy(), digits=4))
 
     # Save and Reload Model
+    torch.save(model.state_dict(), 'diabetes_model.pth')
 
     # Correct: 124 / 154
     # Accuracy: 0.8052
+
 
 #     precision    recall  f1-score   support
 #          0.0     0.9487    0.7400    0.8315       100
