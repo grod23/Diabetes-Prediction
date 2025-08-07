@@ -21,4 +21,6 @@ cd Diabetes-Prediction1
 source venv/bin/activate
 ```
 ### Install Required Packages
+```
 pip install -r requirements.txt
+```
