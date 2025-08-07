@@ -18,15 +18,25 @@ model.load_state_dict(torch.load('diabetes_model.pth', weights_only=True))
 scaler = joblib.load('scaler.pkl')
 model.eval()
 
-patient = {'Name': 'Diana',
-           'Pregnancies': 2,
-           'Glucose': 140,
-           'Blood Pressure': 82,
-           'Skin Thickness': 35,
-           'Insulin': 150,
-           'BMpip freeze > requirements.txt': 33.6,
-           'Diabetes Pedigree Function': 0.627,
-           'Age': 45}
+patient_name = str(input("What is Patient's Name?: "))
+pregnancies = int(input(f'How many pregnancies has {patient_name} had?: '))
+glucose = float(input(f'{patient_name} Plasma Glucose Concentration Level?: '))
+blood_pressure = float(input(f'{patient_name} Blood Pressure(mm Hg)?: '))
+skin_thickness = float(input(f'{patient_name} Triceps skin fold thickness(mm)?: '))
+insulin = float(input(f'{patient_name} 2-Hour serum insulin(mu U/ml)?: '))
+bmi = float(input(f'{patient_name} Body Mass Index(weight in kg/(height in m)^2)?: '))
+diabetes_pedigree = float(input(f'{patient_name} Diabetes Pedigree Probability?: '))
+age = int(input(f'{patient_name} Age(years)?: '))
+
+patient = {'Name': patient_name,
+           'Pregnancies': pregnancies,
+           'Glucose': glucose,
+           'Blood Pressure': blood_pressure,
+           'Skin Thickness': skin_thickness,
+           'Insulin': insulin,
+           'BMI': bmi,
+           'Diabetes Pedigree Function': diabetes_pedigree,
+           'Age': age}
 
 input_data_frame = pd.DataFrame([[
     patient['Pregnancies'],
@@ -54,4 +64,3 @@ with torch.no_grad():
     prediction = (probability > 0.5).float()
 
 print(f'Patient: {patient["Name"]} has a {probability.item()} chance of Diabetes')
-

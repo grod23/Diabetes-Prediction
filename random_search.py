@@ -129,20 +129,3 @@ study.optimize(objective, n_trials=1000)
 print("Best hyperparameters:", study.best_params)
 print(f"Best validation accuracy: {study.best_value:.4f}")
 
-# learning_rate': 0.0012526868639613671, 'epochs': 50, 'batches': 64, 'dropout': 0.10229476735256574,
-# 'weight_decay': 1.037538434833678e-06, 'hidden_size': 132}
-
-# n1=50, n2=51
-# Best hyperparameters: {'learning_rate': 0.003067127556949599, 'epochs': 50, 'batches': 16,
-# 'dropout': 0.13888900962321554, 'weight_decay': 3.9538410247089555e-05, 'hidden_size': 50}
-# Best validation accuracy: 0.7967
-
-# Hidden size n1=6, n2 = 4
-# Best hyperparameters: {'learning_rate': 0.0028769218174318134, 'epochs': 100, 'batches': 32,
-# 'dropout': 0.01603791480289637, 'weight_decay': 0.0043268750206615775}
-# Best validation accuracy: 0.7886
-
-# Hidden Size n1=5
-# Best hyperparameters: {'learning_rate': 0.003862095504444261, 'epochs': 1000, 'batches': 32,
-# 'dropout': 0.016740738378608497, 'weight_decay': 2.9615310381112037e-06}
-# Best validation accuracy: 0.7805
