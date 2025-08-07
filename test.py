@@ -1,6 +1,5 @@
 import torch
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 import joblib
 from model import Model
 
@@ -25,7 +24,7 @@ patient = {'Name': 'Diana',
            'Blood Pressure': 82,
            'Skin Thickness': 35,
            'Insulin': 150,
-           'BMI': 33.6,
+           'BMpip freeze > requirements.txt': 33.6,
            'Diabetes Pedigree Function': 0.627,
            'Age': 45}
 
