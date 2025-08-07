@@ -26,3 +26,5 @@ venv\Scripts\activate          # Windows
 ```
 pip install -r requirements.txt
 ```
+### Run Script
+python test.py
