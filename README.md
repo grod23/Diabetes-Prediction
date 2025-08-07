@@ -14,8 +14,9 @@ This model takes the following 8 inputs:
 ```bash
 git clone https://github.com/grod23/Diabetes-Prediction.git
 cd Diabetes-Prediction
-**Create Virtual enviroment**
+###Create Virtual enviroment
 python -m venv venv
 source venv/bin/activate
-**Install Required Packages**
+
+####Install Required Packages**
 pip install -r requirements.txt
