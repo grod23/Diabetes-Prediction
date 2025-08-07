@@ -18,7 +18,9 @@ cd Diabetes-Prediction1
 
 ### Create Virtual enviroment
 ```python -m venv venv
-source venv/bin/activate
+source venv/bin/activate       # macOS/Linux
+or
+venv\Scripts\activate          # Windows
 ```
 ### Install Required Packages
 ```
