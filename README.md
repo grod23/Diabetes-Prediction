@@ -30,12 +30,12 @@ pip install -r requirements.txt
 ```
 python test.py
 ```
-### Classifcation
+# Classifcation Report
 
-#     precision    recall  f1-score   support
-#          0.0     0.9487    0.7400    0.8315       100
-#          1.0     0.6579    0.9259    0.7692        54
-#
-#     accuracy                         0.8052       154
-#    macro avg     0.8033    0.8330    0.8003       154
-# weighted avg     0.8467    0.8052    0.8096       154
+##     precision    recall  f1-score   support
+##          0.0     0.9487    0.7400    0.8315       100
+##          1.0     0.6579    0.9259    0.7692        54
+##
+##     accuracy                         0.8052       154
+##    macro avg     0.8033    0.8330    0.8003       154
+## weighted avg     0.8467    0.8052    0.8096       154
