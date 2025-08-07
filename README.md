@@ -13,7 +13,7 @@ This model takes the following 8 inputs:
 **Clone the repository**
 ```bash
 git clone https://github.com/grod23/Diabetes-Prediction.git
-cd Diabetes-Prediction1
+cd Diabetes-Prediction
 ```
 
 ### Create Virtual enviroment
