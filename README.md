@@ -9,3 +9,13 @@ This model takes the following 8 inputs:
 6. **BMI** — Body Mass Index (weight in kg/(height in m)^2)
 7. **Diabetes Pedigree Function** — A function that scores likelihood of diabetes based on family history
 8. **Age** — Age of the patient (years)
+## Installation
+**Clone the repository**
+```bash
+git clone https://github.com/grod23/Diabetes-Prediction.git
+cd Diabetes-Prediction
+**Create Virtual enviroment**
+python -m venv venv
+source venv/bin/activate
+**Install Required Packages**
+pip install -r requirements.txt
