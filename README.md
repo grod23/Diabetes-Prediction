@@ -13,10 +13,12 @@ This model takes the following 8 inputs:
 **Clone the repository**
 ```bash
 git clone https://github.com/grod23/Diabetes-Prediction.git
-cd Diabetes-Prediction
-###Create Virtual enviroment
-python -m venv venv
-source venv/bin/activate
+cd Diabetes-Prediction1
+```
 
-####Install Required Packages**
+### Create Virtual enviroment
+```python -m venv venv
+source venv/bin/activate
+```
+###Install Required Packages**
 pip install -r requirements.txt
