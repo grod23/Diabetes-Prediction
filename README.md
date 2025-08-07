@@ -30,7 +30,7 @@ pip install -r requirements.txt
 ```
 python test.py
 ```
-# Classifcation Report
+# Classification Report
 
 ```
                 precision    recall  f1-score   support
@@ -39,7 +39,9 @@ python test.py
 
      accuracy                         0.8052       154
     macro avg     0.8033    0.8330    0.8003       154
- weighted avg     0.8467    0.8052    0.8096       154
-
+ weighted avg     0.8467    0.8052    0.8096       154 
 ```
-
+# Conclusion
+```
+The model favors a **high recall** over precision for diabetic cases, which is ideal in a medical screening context. In these scenarios, **false negatives (missing a true diabetic)** are far more dangerous than **false positives (flagging a non-diabetic as diabetic)**. Model exhibits an **80.52%** accuracy and a strong performance in identifying potential diabetic patients. With a high recall of **92.59%**, the model ensures that most diabetic cases are flagged for further medical attention. While the precision may be lower, this is an acceptable trade-off for an early detection system specifically designed to catch as many diabetic cases as possible for a follow-up screening. All in all, there is defintely room for improvement for larger and more diverse datasets, but the model provides a promising foundation for data-centric tools to be used in medical diagnostics. 
+```
