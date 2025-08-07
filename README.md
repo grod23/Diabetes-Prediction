@@ -33,7 +33,7 @@ python test.py
 # Classifcation Report
 
 ```
-     precision    recall  f1-score   support
+                precision    recall  f1-score   support
           0.0     0.9487    0.7400    0.8315       100
           1.0     0.6579    0.9259    0.7692        54
 
