@@ -18,6 +18,27 @@ model.load_state_dict(torch.load('diabetes_model.pth', weights_only=True))
 scaler = joblib.load('scaler.pkl')
 model.eval()
 
+# diabetic_patient = [[6, 148, 72, 35, 0, 33.6, 0.627, 50]]
+# Pregnancies: 6
+# Glucose: 148 (high)
+# Blood Pressure: 72 (normal)
+# Skin Thickness: 35 (elevated)
+# Insulin: 0 (missing data — common in dataset)
+# BMI: 33.6 (overweight/obese)
+# Diabetes Pedigree Function: 0.627 (moderate family risk)
+# Age: 50 (higher age is a risk factor)
+# Patient likely to NOT have diabetes
+
+# non_diabetic_patient = [[1, 85, 66, 29, 0, 26.6, 0.351, 31]]
+# Pregnancies: 1
+# Glucose: 85 (normal)
+# Blood Pressure: 66 (normal)
+# Skin Thickness: 29 (normal)
+# Insulin: 0 (missing, but others are normal)
+# BMI: 26.6 (healthy range)
+# Diabetes Pedigree Function: 0.351 (low)
+# Age: 31 (relatively young)
+
 patient_name = str(input("What is Patient's Name?: "))
 pregnancies = int(input(f'How many pregnancies has {patient_name} had?: '))
 glucose = float(input(f'{patient_name} Plasma Glucose Concentration Level?: '))

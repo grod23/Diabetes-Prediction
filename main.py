@@ -165,8 +165,8 @@ def main():
         val_accuracy = val_correct / val_total
         recall = true_positives / actual_positives if actual_positives > 0 else 0
 
-        print(f"Epoch: {epoch}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}, "
-              f"Val Accuracy: {val_accuracy:.4f}, Recall: {recall}")
+        # print(f"Epoch: {epoch}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}, "
+        # f"Val Accuracy: {val_accuracy:.4f}, Recall: {recall}")
 
     # Loss VS Epoch
     plt.plot(losses)
