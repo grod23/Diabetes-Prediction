@@ -52,7 +52,7 @@ def main():
     # on Class 1 which is most important
     weight_decay = 0.05
     batches = 64
-    dropout_prob = .02
+    dropout_prob = 0.02
 
     model = Model(dropout_prob=dropout_prob)
     # ADAM Optimizer(Adding Weight Decay)
